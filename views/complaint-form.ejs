@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Submit a Complaint</h1>
+        <form>
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="image">Upload Image (Optional)</label>
+                <input type="file" id="image" name="image">
+            </div>
+            <button type="submit" class="submit">Submit Complaint</button>
+        </form>
+    </div>
+
+
+    <script>
+        const form = document.querySelector('form');
+        const submitBtn = document.querySelector('.submit');
+
+        form.addEventListener('submit', async function(e){
+            e.preventDefault();
+
+            let formData = new FormData(this);
+
+            submitBtn.innerHTML = 'Submitting.....'
+
+            let res = await fetch('/complaint/submit',{
+                method: 'POST',
+                body: formData
+            });
+
+            let data = await res.json();
+
+            data.E ? submitBtn.innerHTML = data.E : submitBtn.innerHTML = data.M;
+
+        })
+    </script>
+</body>
+</html>

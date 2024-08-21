@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Login</h1>
+        <form>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="submit">Login</button>
+        </form>
+    </div>
+</body>
+
+<script>
+    const form = document.querySelector('form');
+    const submitBtn = document.querySelector('.submit');
+
+    form.addEventListener('submit', async function(e){
+        e.preventDefault();
+        let username = form.username.value;
+        let password = form.password.value;
+
+        submitBtn.innerHTML = 'Authenticating.....'
+
+        try{
+            const res = await fetch('/icrs/login', {
+                method : 'POST',
+                body: JSON.stringify({ username, password }),
+                headers: {'Content-Type': 'application/json'}
+            });
+
+            let data = await res.json();
+
+            if(!data){
+                console.error('error in fetching data');
+            }else{
+                if(data.E){
+                    console.log(data.E)
+                }
+                else{
+                    console.log(data.M);
+                    submitBtn.innerHTML = 'login success'
+                    setInterval(()=>{
+                        location.assign('/icrs/dashboard');
+                    }, 1000)
+                }       
+            }
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
+</script>
+</html>
