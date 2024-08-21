@@ -51,7 +51,7 @@ app.use(fileuploader({useTempFiles: true}));
 //     readEmails()
 // }, 1000);
 
-const meet = (e) =>{readEmails()}
+// const meet = (e) =>{readEmails()}
 
 // Routes
 app.get('/', (req,res)=>{

@@ -57,7 +57,9 @@
 
             let data = await res.json();
 
-            data.E ? submitBtn.innerHTML = data.E : submitBtn.innerHTML = data.M;
+            if(data.E) submitBtn.innerHTML = data.E;
+
+            submitBtn.innerHTML = data.M;
 
         })
     </script>

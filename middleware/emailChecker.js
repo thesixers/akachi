@@ -23,12 +23,16 @@ const configs = {
     },
 };
 
+const connection = await imaps.connect(configs);
+console.log(connection.openBox());
+
 
 export const readEmails = async () => {
     try {
         // Connect to the email server
         const connection = await imaps.connect(configs);
         await connection.openBox('INBOX');
+        
 
         // Search for unread emails
         const searchCriteria = ['UNSEEN'];

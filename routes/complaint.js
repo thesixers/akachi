@@ -48,9 +48,7 @@ router.post('/submit', async (req, res) => {
 router.post('/resolve/:id', async (req, res) => {
     try {
         const complaint = await Complaint.findById(req.params.id);
-        if (!complaint) return res.status(404).json({
-            E: 'Complaint not found'
-        });
+        if (!complaint) return res.status(404).json({E: 'Complaint not found'});
 
         complaint.resolved = 'true';
         await complaint.save();
