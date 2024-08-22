@@ -46,13 +46,6 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(fileuploader({useTempFiles: true}));
 
-
-// setInterval(() => {
-//     readEmails()
-// }, 1000);
-
-// const meet = (e) =>{readEmails()}
-
 // Routes
 app.get('/', (req,res)=>{
     res.redirect('/icrs');

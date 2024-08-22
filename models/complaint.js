@@ -4,7 +4,7 @@ const complaintSchema = new mongoose.Schema({
     title: { type: String, required: true },
     email: { type: String, required: true },
     description: { type: String, required: true },
-    priority: { type: String, enum: ['low', 'medium', 'high'], default: 'low' },
+    priority: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
     imageUrl: { type: String },
     resolved: { type: String, default: 'false' }
 });

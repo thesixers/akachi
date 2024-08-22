@@ -3,17 +3,16 @@ import { simpleParser } from 'mailparser';
 import mongoose from 'mongoose';
 import { config } from 'dotenv';
 import Complaint from '../models/complaint.js';
+import { json } from 'express';
 
 config();
 const {EMAIL_PASS, EMAIL_USER} = process.env
-
-// console.log({EMAIL_PASS, EMAIL_USER});
 
 const configs = {
     imap: {
         user: EMAIL_USER,
         password: EMAIL_PASS,
-        host: 'imap.gmail.com', // Replace with your email provider's IMAP server
+        host: 'imap.gmail.com',
         port: 993,
         tls: true,
         tlsOptions: {
@@ -23,16 +22,7 @@ const configs = {
     },
 };
 
-
 export const readEmails = async () => {
-
-    let content = {
-        title: '',
-        email: '',
-        description: '',
-        priority: '',
-        imageUrl: '',
-    }
     try {
         console.log('Connecting to the email server...');
         const connection = await imaps.connect(configs);
@@ -43,25 +33,37 @@ export const readEmails = async () => {
         const fetchOptions = { bodies: ['HEADER', 'TEXT'], markSeen: true };
 
         const messages = await connection.search(searchCriteria,fetchOptions);
-        console.log(`Found ${messages.length} unread emails.`); 
 
         for (const message of messages) { 
             let part =  await message.parts[1];
             let body  = part.body; 
-            let email =  body.from[0].split(' ')[2].replace(/[<>]/gi, '');
-            let subject = body.subject;
-            let boundary = body['content-type'].split(' ')[1].split('=')[1];
-            const sections = part.body.split(boundary);
+            let title = body.subject ? body.subject[0] : '';
+            let T = typeof title === 'string'? title : JSON.stringify(title);
             
-            console.log(subject +' '+ email);  
-            console.log(body);
-            console.log('.........................');
-            console.log(message);     
+
+            if(T.toLowerCase().includes('complain') || T.toLowerCase().includes('complaint')){
+                let email =  body.from[0].split(' ')[2].replace(/[<>]/gi, '');
+                let boundary = body['content-type'][0].split(' ')[1].split('=')[1].replace(/["]/gi,'')  
+                const sections = message.parts[0].body.split(boundary);   
+                let description =  sections.map(section => {
+                    const textMatch = section.match(/Content-Type: text\/plain; charset="UTF-8"\r\n\r\n([\s\S]*?)\r\n\r\n/);
+                    return textMatch ? textMatch[1] : null;
+                });  
+
+                let uploadComplaint = await Complaint.create({
+                    title: title,
+                    email: email,
+                    description: description[1]
+                });
+
+                uploadComplaint ? console.log('message saved') : console.log('message not saved')
+            }
+                 
 
 
         }       
     } catch (error) {
-        console.error('Error reading emails:', error);
+        console.error('Error reading emails:', error);  
     }
 };
 
@@ -100,6 +102,8 @@ export const readEmails = async () => {
 // });
 
 
-readEmails(); 
+setInterval(() => {
+    readEmails(); 
+}, 50000);
 
 // module.exports = {readEmails} 
