@@ -76,7 +76,7 @@
                             <td>
                                 <form action="/complaint/resolve/<%= complaint._id %>" method="post">
 
-                                    <button type="submit">Mark as Resolved</button>
+                                    <button type="submit" onclick="updateComplaintStatus('<%= complaint._id %>')">Mark as Resolved</button>
                                 </form>
                             </td>
                         </tr>

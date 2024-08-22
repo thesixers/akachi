@@ -23,58 +23,43 @@ const configs = {
     },
 };
 
-const connection = await imaps.connect(configs);
-console.log(connection.openBox());
-
 
 export const readEmails = async () => {
+
+    let content = {
+        title: '',
+        email: '',
+        description: '',
+        priority: '',
+        imageUrl: '',
+    }
     try {
-        // Connect to the email server
+        console.log('Connecting to the email server...');
         const connection = await imaps.connect(configs);
         await connection.openBox('INBOX');
-        
+        console.log('Connected to the email server and opened INBOX.');
 
-        // Search for unread emails
         const searchCriteria = ['UNSEEN'];
         const fetchOptions = { bodies: ['HEADER', 'TEXT'], markSeen: true };
 
-        // Fetch emails
-        const messages = await connection.search(searchCriteria, fetchOptions);
+        const messages = await connection.search(searchCriteria,fetchOptions);
+        console.log(`Found ${messages.length} unread emails.`); 
 
-        for (const message of messages) {
-            const all = message.parts.find(part => part.which === 'TEXT');
-            const parsed = await simpleParser(all.body);
+        for (const message of messages) { 
+            let part =  await message.parts[1];
+            let body  = part.body; 
+            let email =  body.from[0].split(' ')[2].replace(/[<>]/gi, '');
+            let subject = body.subject;
+            let boundary = body['content-type'].split(' ')[1].split('=')[1];
+            const sections = part.body.split(boundary);
+            
+            console.log(subject +' '+ email);  
+            console.log(body);
+            console.log('.........................');
+            console.log(message);     
 
-            const { subject, from, text, attachments } = parsed;
-            const email = from.value[0].address;
-            const title = subject || 'No Subject';
-            const description = text || 'No Description';
 
-            // Handle attachment if needed
-            let imageUrl = null;
-            if (attachments.length > 0) {
-                const attachment = attachments[0];
-                // Save the attachment if necessary and get its URL
-                // For demonstration, we're using attachment.filename directly
-                imageUrl = attachment.filename;
-                console.log(attachment);
-            }
-
-            // Create a new complaint entry in the database
-            const complaint = new Complaint({
-                title,
-                email,
-                description,
-                priority: 'Normal', // Default priority
-                imageUrl,
-            });
-
-            await complaint.save();
-            console.log('Complaint saved:', complaint);
-
-            // Optionally, send a confirmation email
-            sendConfirmationEmail(email, title);
-        }
+        }       
     } catch (error) {
         console.error('Error reading emails:', error);
     }
@@ -115,6 +100,6 @@ export const readEmails = async () => {
 // });
 
 
-// readEmails();
+readEmails(); 
 
-// module.exports = {readEmails}
+// module.exports = {readEmails} 

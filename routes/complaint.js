@@ -77,7 +77,7 @@ router.post('/resolve/:id', async (req, res) => {
             }
         });
 
-        res.redirect('/admin/dashboard');
+        res.redirect('/icrs/dashboard');
     } catch (error) {
         res.status(500).send('Internal Server Error');
     }
