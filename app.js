@@ -13,23 +13,19 @@ import Complaint from './routes/complaint.js';
 
 const app= express();
 
-
-
 // Load environment variables
 config();
 
+const {PORT, MONGO_URI} = process.env
 
-
-const PORT = process.env.PORT || 3000;
-
-
+const port = PORT || 3000; 
 
 // MongoDB Connection
-connect(process.env.MONGO_URI)
+connect(MONGO_URI)
 .then(() => {
     console.log('MongoDB connected');
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
+    app.listen(port, () => {
+        console.log(`Server running on port ${port}`);
     });
 }).catch(err => {
     console.log('MongoDB connection error: ', err.message);
@@ -37,7 +33,6 @@ connect(process.env.MONGO_URI)
 
 // Middleware
 app.set('view engine', 'ejs');
-
 
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true })); 

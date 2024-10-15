@@ -3,7 +3,7 @@ const router = express.Router();
 import Complaint from '../models/complaint.js';
 import nodemailer from 'nodemailer';
 import gx from 'genesix';
-import { uploadImage } from '../middleware/formError.js';
+import { sendEmails, uploadImage } from '../middleware/formError.js';
 
 router.get('/', (req,res)=>{
     res.redirect('/complaint/form')
@@ -53,29 +53,7 @@ router.post('/resolve/:id', async (req, res) => {
         complaint.resolved = 'true';
         await complaint.save();
 
-        // Send an email to the user
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
-
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: complaint.email,
-            subject: 'Complaint Resolved',
-            text: `Dear User, your complaint titled "${complaint.title}" has been resolved. Thank you for your patience.`
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error('Error sending email:', error);
-            } else {
-                console.log('Email sent:', info.response);
-            }
-        });
+        await sendEmails('resolve',complaint);
 
         res.redirect('/icrs/dashboard');
     } catch (error) {

@@ -1,9 +1,8 @@
 import imaps from 'imap-simple';
-import { simpleParser } from 'mailparser';
-import mongoose from 'mongoose';
 import { config } from 'dotenv';
 import Complaint from '../models/complaint.js';
 import { json } from 'express';
+import { sendEmails } from './formError.js';
 
 config();
 const {EMAIL_PASS, EMAIL_USER} = process.env
@@ -56,7 +55,7 @@ export const readEmails = async () => {
                     description: description[1]
                 });
 
-                uploadComplaint ? console.log('message saved') : console.log('message not saved')
+                await sendEmails('received',uploadComplaint);
             }
                  
 
@@ -66,40 +65,6 @@ export const readEmails = async () => {
         console.error('Error reading emails:', error);  
     }
 };
-
-// Function to send a confirmation email
-// const sendConfirmationEmail = (userEmail, complaintTitle) => {
-//     const nodemailer = require('nodemailer');
-
-//     const transporter = nodemailer.createTransport({
-//         service: 'gmail',
-//         auth: {
-//             user: 'your-email@gmail.com',
-//             pass: 'your-email-password',
-//         },
-//     });
-
-//     const mailOptions = {
-//         from: 'no-reply@yourdomain.com',
-//         to: userEmail,
-//         subject: 'Complaint Received',
-//         text: `Dear user,\n\nYour complaint titled "${complaintTitle}" has been received and is being processed.\n\nBest regards,\nSupport Team`,
-//     };
-
-//     transporter.sendMail(mailOptions, (error, info) => {
-//         if (error) {
-//             console.log('Error sending confirmation email:', error);
-//         } else {
-//             console.log('Confirmation email sent:', info.response);
-//         }
-//     });
-// };
-
-// Run the email reading function periodically
-// const cron = require('node-cron');
-// cron.schedule('*/5 * * * *', () => {
-//     readEmails();
-// });
 
 
 setInterval(() => {

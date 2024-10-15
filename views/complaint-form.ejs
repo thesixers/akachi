@@ -46,20 +46,27 @@
         form.addEventListener('submit', async function(e){
             e.preventDefault();
 
+           try{
+
             let formData = new FormData(this);
 
-            submitBtn.innerHTML = 'Submitting.....'
+                submitBtn.innerHTML = 'Submitting.....'
 
-            let res = await fetch('/complaint/submit',{
-                method: 'POST',
-                body: formData
-            });
+                let res = await fetch('/complaint/submit',{
+                    method: 'POST',
+                    body: formData
+                });
 
-            let data = await res.json();
+                let data = await res.json();
 
-            if(data.E) submitBtn.innerHTML = data.E;
+                if(data.E) submitBtn.innerHTML = data.E;
 
-            submitBtn.innerHTML = data.M;
+                submitBtn.innerHTML = data.M;
+
+           }
+           catch(err){
+            console.log(err);
+           }
 
         })
     </script>

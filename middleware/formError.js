@@ -7,6 +7,8 @@ let secret = process.env.CLOUDINARY_SECRET;
 let api_key = process.env.CLOUDINARY_API_KEY;
 let id = process.env.CLOUDINARY_ID;
 
+const {EMAIL_USER,EMAIL_PASS} = process.env;
+
 
 
 export const uploadImage =  async(image) =>{
@@ -85,3 +87,28 @@ export const checkLogin = (req,res,next) =>{
 
 }
 
+
+export const sendEmails = (mailType,complaint) =>{
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: EMAIL_USER,
+            pass: EMAIL_PASS
+        }
+    });
+
+    const mailOptions = {
+        from: EMAIL_USER,
+        to: complaint.email,
+        subject: 'Complaint Resolved',
+        text:( mailType === 'resolve') ? `Dear User, your complaint titled "${complaint.title}" has been resolved. Thank you for your patience.` : `Dear User, your complaint titled "${complaint.title}" has been received.`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return 'Error sending email:', error;
+        } else {
+            return 'Email sent:', info.response;
+        }
+    });
+}
