@@ -49,7 +49,7 @@ router.post('/register', (req, res) => {
     const { username, password } = req.body;
     console.log({username, password});
     
-    create({username, password})
+    Admin.create({username, password})
     .then(result =>{
         console.log(result);
         res.json({

@@ -14,6 +14,22 @@ router.get('/form', (req, res) => {
     res.render('complaint-form', { title: 'Submit a Complaint' });
 });
 
+router.post('/resolved', async (req, res) => {
+    const {id} = req.body;
+    try {
+        let complaint = await Complaint.findById(id);
+        complaint.resolved = 'true';
+        await complaint.save();
+
+        await sendEmails('resolve', complaint);
+
+        res.status(200).json({M: 'resolved'});
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({E: 'not resolved'});
+    }
+});
+
 // Handle Complaint Submission
 router.post('/submit', async (req, res) => {
     const { title, email, description, priority } = req.body;
@@ -42,22 +58,6 @@ router.post('/submit', async (req, res) => {
         res.status(400).json({
             E: 'Error in submitting complaint try again'
         });
-    }
-});
-
-router.post('/resolve/:id', async (req, res) => {
-    try {
-        const complaint = await Complaint.findById(req.params.id);
-        if (!complaint) return res.status(404).json({E: 'Complaint not found'});
-
-        complaint.resolved = 'true';
-        await complaint.save();
-
-        await sendEmails('resolve',complaint);
-
-        res.redirect('/icrs/dashboard');
-    } catch (error) {
-        res.status(500).send('Internal Server Error');
     }
 });
 

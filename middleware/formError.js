@@ -1,7 +1,9 @@
+import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
 config();
 import { v2 as cloudinary } from 'cloudinary';
+
 
 let secret = process.env.CLOUDINARY_SECRET;
 let api_key = process.env.CLOUDINARY_API_KEY;
